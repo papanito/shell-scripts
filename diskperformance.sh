@@ -1,6 +1,8 @@
 #!/bin/bash
 writetodisk() {
 	COUNTER=0
+	device=`df $OUTPUTDIR | grep -oe "/dev/[A-Za-z]*"`
+    	echo "directory $OUTPUTDIR selected for test. disk under test is $device"
 	while [ $COUNTER -lt $MAX ]; do
 		dd if=/dev/zero of=$OUTPUTDIR/testfile bs=1G count=1 oflag=direct | tee $OUTPUTDIR/$LOGFILE
 		let COUNTER=COUNTER+1
@@ -44,10 +46,9 @@ while getopts "hn:" optname
 done
 
 #output directory has to be specified
-if [ "$1" != "" ]; then
-    device=`df /root | grep -oe "/dev/[A-Za-z]*"`
-    echo "directory $1 selected for test. disk under test is $device"
-    OUTPUTDIR=$1
+dir=${@:$OPTIND}
+if [ "$dir" != "" ]; then
+    OUTPUTDIR=$dir
 else
     echo "no directory selected, assuming default which is $OUTPUTDIR"
 fi
