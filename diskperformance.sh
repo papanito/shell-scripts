@@ -4,14 +4,17 @@ writetodisk() {
 	device=`df $OUTPUTDIR | grep -oe "/dev/[A-Za-z]*"`
     	echo "directory $OUTPUTDIR selected for test. disk under test is $device"
 	while [ $COUNTER -lt $MAX ]; do
-		dd if=/dev/zero of=$OUTPUTDIR/testfile bs=1G count=1 oflag=direct | tee $OUTPUTDIR/$LOGFILE
+		dd if=/dev/zero of=$OUTPUTDIR/$TESTFILE bs=1G count=1 oflag=direct | tee ~/$LOGFILE
 		let COUNTER=COUNTER+1
 	done
+
+	rm $OUTPUTDIR/$TESTFILE
 }
 #global parameters
 MAX=10
 OUTPUTDIR=/root
 LOGFILE=diskperformance.log
+TESTFILE=diskperformance.test
 
 usage="$(basename "$0") [-h] [-n <loops>]  <outputdir> 
 where:
