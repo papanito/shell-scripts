@@ -1,3 +1,4 @@
-for i in ~/.local/share/gnome-shell/extensions/*;do gnome-shell-extension-tool -e "$i";done
-gnome-shell-extension-tool -e /usr/share/gnome-shell/extensions/GPaste@gnome-shell-extensions.gnome.org
-gnome-shell-extension-tool -e /usr/share/gnome-shell/extensions/auto-move-windows@gnome-shell-extensions.gcampax.github.com
+localPath=~/.local/share/gnome-shell/extensions/
+for i in $localPath/*;do echo $(basename $i);gnome-extensions enable "$(basename $i)";done
+gnome-extensions enable GPaste@gnome-shell-extensions.gnome.org
+gnome-extensions enable gnome-shell-extensions.gcampax.github.com
