@@ -1,0 +1,125 @@
+#!/bin/bash
+# Author : dave@meyer.LA
+# Date   : 20/09/2010
+#
+# Text Recognition Ver. 1.1
+# Now using the tesseract engine by default!
+# An OCR, Optical Character Recognition, gui application and cli script
+# This script will convert almost any image of text (except pdf's)*1 into editable text.
+#
+# For OCR'ing, the preferred formats are of the tiff or pnm class: .tiff .tif .pnm .pbm .pgm .ppm
+# Compatible formats are: .jpg .jpeg .gif .png .bmp .xcf .pct .pict
+#
+# These recognition engines have a very high character recognition success rate compared to other OCR's, including proprietary software.
+#
+# REM: The better/cleaner/higher contrasted/higher resolution your image/scan is the better the results
+# 
+# Dependencies: requires libtiff-dev (or -devel), tesseract-2.04 (latest stable-version), your chosen language data for Tesseract (2.00 and up) *2,
+# ImageMagick, zenity, and OpenOffice or other text editor *3
+# This version of tesseract can be downloaded from here: http://code.google.com/p/tesseract-ocr/downloads/list
+# Warning: This script will not work with the latest beta version (tesseract 3.00 pre-release) due to database structure modifications. 
+# 
+# Optional dependencies: ocrad ->an alternate recognition engine | if the inital results are unsatisfactory, maybe this engine will do better
+# The latest version of ocrad can be downloaded off the GNU mirror list here: http://www.gnu.org/software/ocrad/
+# 
+# Also: Make sure to select Unicode UTF-8 in OpenOffice's pop-up window (or text editor of your choice). 
+# 
+#
+#
+# *1 	To extract text from PDF's use this online app: http://www.pdfescape.com/pdf/account/
+# *2 	Install Tesseract first. Then extract all the language databases you need into the "wherever_you_installed/tesseract-2.04/tessdata" directory.
+# 		This is done automatically if you extract the language databases from WITHIN the "tesseract-2.04" directory (and allow overwriting).
+# 		This script allows the use of multiple language databases. Default is English and French. For adding others see comments below.
+#		You NEED at least one language database or tesseract will not work.
+# *3 	Simply change the occurance of "soffice -writer" below to a text editor of your choice, ie: gedit, KWrite, etc 
+# 		Some systems call on OpenOffice Writer differently. If unsure, check the properties tab of your Writer launcher.
+# 		Ie: On customized versions of OOo (such as the ones provided by Linux Mandrake or Gentoo), you start Writer with: oowriter 
+#
+#
+# Troubleshooting:
+#		If this script ends saying your text editor can't open "OCR output-editable text.txt", 
+#		or if run off the cli: Unable to load unicharset file /usr/local/share/tessdata/eng.unicharset 
+#		do (as superuser):
+#		echo /usr/local/share /usr/share | xargs -n 1 cp -R wherever_you_installed/tesseract-2.04/tessdata 
+#			Explanation: 	Tesseract may call on the tessdata directory from the /share directory of your filesystem, 
+#							so you need to make your language databases available from there.
+#
+
+# First we make sure something's selected.
+if [ $# -eq 0 ]; then
+	zenity --warning --title="Error" --text="This won't work if you don't select a file..."
+	exit 1
+fi
+
+# Prompt for which language database to use
+USE_LANG=$(zenity --list --title="Language selection" --text="Please select the language of the text in the image:" --radiolist --column "" --column "" TRUE English FALSE French) # add other languages  by apphending this list
+
+# Ensure ~/Tmp exists w/o deleting anything
+mkdir -p $HOME/Tmp
+
+# Test if the file is an image
+# The following may not work if the file is on the desktop ...
+# IS_IMAGE=`file -bi "$FILE_NAME" | grep -c image`
+# so we do differently.
+IS_IMAGE=`echo "$1" | grep -i -c -E  [.]pbm\|[.]pgm\|[.]ppm\|[.]pnm\|[.]jpg\|[.]gif\|[.]png\|[.]jpeg\|[.]bmp\|[.]tiff\|[.]tif\|[.]xcf\|[.]pct\|[.]pict\|[.]pdf`
+  case $IS_IMAGE in
+        0)
+                zenity --warning --title="Incompatible file format" --text="This file doesn't seem to be an image. If it is, open it in GIMP and save as -> select the .pnm extension -> then try again. Note: to extract text from PDF's use this online app: http://www.pdfescape.com/pdf/account/"
+		exit 1
+                ;;
+        1)
+		# Test if the file is an image of the tiff class format.
+ 		IS_PNM=`echo "$1" | grep -i -c -E [.]tiff\|[.]tif`
+		if [ $IS_PNM -eq 0 ]; then
+
+ 			# Since the file is not a .tiff image, convert it using ImageMagick
+			convert "$1" "$HOME/Tmp/converted for OCR.tif"
+			 case $USE_LANG in
+        			English)
+					#OCR operation. The following works on the Desktop too! Uncomment the recognition engine of your choice:
+					tesseract "$HOME/Tmp/converted for OCR.tif" "$HOME/Tmp/OCR output-editable text" -l eng
+					# ocrad -f --format=utf8 "$1" -o "$HOME/Tmp/OCR output-editable text.txt"
+					;;
+				French)
+					# OCR operation. The following works on the Desktop too! Uncomment the recognition engine of your choice:
+					tesseract "$HOME/Tmp/converted for OCR.tif" "$HOME/Tmp/OCR output-editable text" -l fra
+					# ocrad -f --format=utf8 "$1" -o "$HOME/Tmp/OCR output-editable text.txt"
+					;;
+				# Uncomment to add other language(s). Replace variables "Other_Language" and "Other_Language_ID".			
+				# Other_Language)
+					# #OCR operation. The following works on the Desktop too! Uncomment the recognition engine of your choice:
+					# tesseract "$1" "$HOME/Tmp/tesseract output-editable text" -l Other_Language_ID
+					# # ocrad -f --format=utf8 "$1" -o "$HOME/Tmp/OCR output-editable text.txt"
+					# ;;
+			esac
+		fi
+
+			 case $USE_LANG in
+        			English)
+					#OCR operation. The following works on the Desktop too! Uncomment the recognition engine of your choice:
+					tesseract "$1" "$HOME/Tmp/OCR output-editable text" -l eng
+					# ocrad -f --format=utf8 "$1" -o "$HOME/Tmp/OCR output-editable text.txt"
+					;;
+				French)
+					# OCR operation. The following works on the Desktop too! Uncomment the recognition engine of your choice:
+					tesseract "$1" "$HOME/Tmp/OCR output-editable text" -l fra
+					# ocrad -f --format=utf8 "$1" -o "$HOME/Tmp/OCR output-editable text.txt"
+					;;
+				# Uncomment to add other language(s). Replace variables "Other_Language" and "Other_Language_ID".			
+				# Other_Language)
+					# #OCR operation. The following works on the Desktop too! Uncomment the recognition engine of your choice:
+					# tesseract "$1" "$HOME/Tmp/tesseract output-editable text" -l Other_Language_ID
+					# # ocrad -f --format=utf8 "$1" -o "$HOME/Tmp/OCR output-editable text.txt"
+					# ;;
+			esac
+
+			# Open the newly created output file (chg "soffice -writer" to text editor of your choice)
+ 			cd /$HOME/Tmp
+			soffice -writer "OCR output-editable text.txt"
+		;;
+        *)
+                zenity --warning --title="Corrupted file" --text="Open file in GIMP and save as -> select the .pnm extension -> then try again. Otherwise rescan the page."
+		exit 1
+                ;;
+  esac
+

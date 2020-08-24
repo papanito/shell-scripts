@@ -1,0 +1,54 @@
+###########################################################
+#             -= [Script] De X a ISO (EOL) =-             #
+# --------------------------------------------------------#
+#                                                         #
+#  * Este Scripts sirve para crear imágenes ISO de una    #
+#  carpeta selecciona o UN SOLO ARCHIVO SELECCIONADO.     #
+#                                                         #
+#  * La ISO se creara con el mismo nombre que tenga la    #
+#  carpeta u el archivo, y se alojara en el mismo         #
+#  directorio en la que se encuentre la carpeta u archvo  #
+#  seleccionado.                                          #
+#                                                         #
+#                                                         #
+#                                                         #
+#                                                         #
+#                   www.elotrolado.net                    #
+#                                                         #
+#                                                         #
+#               -------= CRÉDITOS =-------                #
+#                                                         #
+#   * e-Minguez                                           #
+#   * jorchube                                            #
+#   * dodger                                              #
+#   * capitanquartz                                       #
+#   * amuchamu (el señor de las barras de progreso xD)    #
+#   * AMCYMONSE (el que menos a hecho xDD)                #
+#                                                         #
+#                                                         #
+#               -------= LICENCIA =-------                #
+#                                                         #
+#                      *** GPL. ***                       #
+#                                                         #
+###########################################################
+
+
+#Empezamos xDDDD
+
+
+
+#!/usr/bin/env bash
+zenity --question --text="¿Create an ISO image here?" || exit
+
+(mkisofs -r -o "$*".iso "$*" 2>&1 |
+while read i; do
+	PARCIAL=$(echo $i | grep -o [0-9]*'\.'[0-9]*)
+	if [ $PARCIAL ]; then
+		echo $PARCIAL
+		echo "# $PARCIAL% done..."
+	fi;
+done
+echo "# Finish." ) | zenity --progress --title="Creating \"$*.iso\""
+
+
+#Fin.

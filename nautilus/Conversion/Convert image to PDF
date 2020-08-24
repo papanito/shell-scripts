@@ -1,0 +1,17 @@
+#!/bin/bash
+trap errormsg SIGINT SIGTERM ERR
+
+job() {
+	echo "convert Image to pdf"
+
+	while [ $# -gt 0 ]; do
+		pdf=$1
+		pdf_file=`echo "$pdf" | sed 's/\.\w*$/.pdf/'`
+		/usr/bin/convert -quality 100 "$pdf" "$pdf_file"
+		shift
+	done
+}
+
+
+export -f job
+job $@

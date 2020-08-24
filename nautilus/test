@@ -1,0 +1,33 @@
+#!/bin/bash
+# save stdout (by linking it on fd #4 for instance)
+exec 4<&1
+# redirect stderr
+exec 2>error
+      # Redirects stderr to stdout.
+
+errormsg() {
+	 zenity --warning \
+	--text $1 
+}
+
+job()
+{
+	echo "convert Image to pdf"
+
+	while [ $# -gt 0 ]; do
+		pdf=$1
+		echo "convert file $pdf"
+		pdf_file=`echo "$pdf" | sed 's/\.\w*$/.pdf/'`
+		/usr/bin/convert -quality 100 "$pdf" "$pdf_file"
+		shift
+	done	
+}
+
+trap errormsg  SIGINT SIGTERM ERR
+#export -f job
+
+#gnome-terminal --command bash -c 'job $@'
+job $@
+echo $error
+
+exec 4>&-

@@ -1,0 +1,240 @@
+#!/bin/bash
+# replace tag {date} with a date value in format YYYYmmdd
+function getDate() {
+    varname=$(echo $1 | sed -r 's/[\{\}]//g')
+    lastval=${lastvalues[$varname]}
+    local year=$(echo `date --date="$lastval" +%Y`)
+    local month=$(echo `date --date="$lastval" +%m`|sed 's/^0*//g')
+    local day=$(echo `date --date="$lastval" +%d`|sed 's/^0*//g')
+    value=`zenity --calendar --date-format=%Y%m%d --year=$year --day=$day --month=$month --text="$text_please_select a date (yyyymmdd)"`
+
+    echo "replace $1 with VALUE $value"
+    pattern=${pattern/${1}/${value}}
+    lastvalues[$varname]="$value"
+}
+
+# open file for viewing
+function viewImage() {
+    filename_orig=$1
+    ext=${filename_orig:(-3)}
+    ext=${ext,,}
+
+    case $ext in
+    png) # open image with eog
+        eog "$filename_orig"&
+        PID=$!
+        ;;
+    jpg) # open image with eog
+        eog "$filename_orig"&
+        PID=$!
+        ;;
+    pdf) # open pdf with eog
+        evince "$filename_orig"&
+        PID=$!
+    ;;
+    *)
+        echo "Unknown filetype, so no preview"
+        #zenity --error --text "Unknown filetype, so no preview"
+        #exit
+    esac
+}
+
+#rename a given file $1 with $2
+#if file already exists, a postfix is added to the file to be renamed
+function renameFile() {
+    echo "File '$1' to be renamed"
+    if [ -e "$1" ]; then
+        y=1
+        filename_new="$2"
+        ext=$3
+
+        while [ -f "$filename_new.$ext" ]; do
+            count="0$y"
+            count=${count:(-2)}
+            filename_new=$2"-"$count
+            let "y += 1"
+        done
+
+        filename_new=$filename_new"."$ext
+
+        mv "$1" "$filename_new"
+        echo "File '$1' renamed to '$filename_new'"
+    else
+        echo "File '$1' does not exist, skipping"
+    fi
+}
+
+# converts image file into pdf
+function convertToPdf() {
+    pdf_file=`echo "$1" | sed 's/\.\w*$/.pdf/'`
+    /usr/bin/convert -quality 90 "$1" "$pdf_file"
+}
+
+# kills document reader before exiting script
+function finish {
+    # kill image viewer
+    kill $PID
+    exit;
+}
+
+# replace tag {xxx} with a free text.
+# dialog will propose last used value for the specific tag
+function createFreetext() {
+    varname=$(echo $1 | sed -r 's/[\{\}]//g')
+    while [[ $pattern =~ "$1" ]]; do
+        lastval=${lastvalues[$varname]}
+        value=`zenity --entry --text "item '$1'" --entry-text "$lastval"`
+           #if [ "$value" = "" ]; then
+               #finish;
+           #fi
+           pattern=${pattern/${1}/${value}}
+        lastvalues[$varname]="$value"
+    done
+}
+
+# loads array from docrenamer.cfg into a list-dialog
+# use environment variable DOCRENAMERCONFIGDIR
+function createList() {
+    listName=$(echo $1 | sed -r 's/[\{\}]//g')
+    lastval=${lastvalues[$listName]}
+    local names
+    local x=0
+    declare -n names="$listName"
+    
+    local options=""
+    local width=200
+    local width_new=200
+
+    #if array exists itn docrenamer.cfg then element {xx} shall be parsed
+    if [ ${#names[@]} -gt 0 ]; then
+        for i in ${names[@]}; do
+            #expand width of dialog to see longest item
+            let width_new=${#i}*10
+            if [ "$width_new" -gt "$width" ]; then
+                let width=width_new
+            fi
+            options=$options" FALSE "$i
+        done
+        # add {freetext} to all lists, in case desired value is not yet in docrenamer.cfg
+        options=$options" FALSE {freetext}"
+
+        if [[ "$1" = "main" ]]; then
+            echo "LAST: ${lastvalues[recent]}"
+            # add option to use last used filename
+            if [[ "${lastvalues[recent]}" != "" ]]; then
+                options=$options" FALSE {recent}"
+            fi
+            # add option to skip file from renaming or mark file to be deleted
+            options=$options" FALSE {skip}"
+            options=$options" FALSE {delete}"
+            pattern=`zenity --list --title "$text_please_select item '$1'" --height=500 --width=$width --radiolist --column "Pick" --column "Subject" $options`
+        else
+            while [[ $pattern =~ "$1" ]]; do
+                value=`zenity --list --title "$text_please_select item '$1'" --height=500 --width=$width --radiolist --column "Pick" --column "Subject" $options`
+                #if [ "$value" = "" ]; then
+                    #finish;
+                #fi
+                pattern=${pattern/${1}/${value}}
+            done
+        fi
+    else
+        #otherwise a text field shall be presented where user can specify it's own values
+        createFreetext $1
+    fi
+
+    # post processing replaces spaces with . and removes __ or _.
+    pattern=${pattern/[[:space:]]/"."}
+}
+regex='\{[[:alpha:]]*\}'
+
+declare pattern
+# declare an array, requires bash 4. Essentially put =() to make it working
+# https://stackoverflow.com/questions/16553089/dynamic-variable-names-in-bash
+declare -A lastvalues=()
+
+skip=false
+
+#outter loop: do for each file submitted via command line
+while [[ $1 ]]
+do
+    # get filename extension
+    filename_orig="$1"
+    ext=${filename_orig:(-3)}
+    
+    viewImage "$1"
+    # load docrenamer.cfg for each file (allows modifications of values while script is running)
+    # good idea? memory consumption or other negative impact?
+    # DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    #echo "$DOCRENAMERCONFIGDIR/docrenamer.cfg"
+    [ -z ${DOCRENAMERCONFIGDIR+x} ] && export DOCRENAMERCONFIGDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+    source "$DOCRENAMERCONFIGDIR/docrenamer.cfg"
+
+    #create a list of all patterns to select
+    createList "main"
+    if [[ "$pattern" != "" ]]; then
+        echo "Selected pattern: $pattern"
+
+        # iterate over all tags {xxx} and replace them with a user provided value
+        while [[ $pattern =~ $regex ]]; do
+            match=${BASH_REMATCH[@]}
+
+            # handle "special" tags
+            case $match in
+            "{date}")
+                getDate ${match}
+                ;;
+            "{date[:alnum:]*}")
+                getDate ${match}
+                ;;
+            "{skip}")
+                echo "SET SKIP: $skip"
+                skip=true
+                break
+                ;;
+            "{delete}")
+                pattern="DELETE"
+                break
+                ;;
+            *)
+                createList ${match}
+                ;;
+            esac
+        done
+
+        echo "Pattern is '$pattern'"
+        pattern=$(echo $pattern | sed -r 's/__//g')
+        pattern=$(echo $pattern | sed -r 's/_$//g')
+        pattern=$(echo $pattern | sed -r 's/\._//g')
+        echo "Pattern is '$pattern'"
+
+        [[ $pattern = "" ]] && skip=true
+
+        lastvalues[recent]="$pattern"
+        if $skip; then
+            echo "skip file '$1' for renaming"
+        else
+            renameFile "$1" $pattern $ext
+        fi
+        # manipulate image files
+        case "$ext" in
+            pdf) ;;
+            png)
+                convertToPdf $filename_new
+                ;;
+            jpg)
+                convertToPdf $filename_new
+                ;;
+            jpeg)
+                convertToPdf $filename_new
+                ;;
+            *) ;;
+        esac
+    else
+        finish
+    fi
+    #kill preview application
+    [ "$PID" != "" ] && kill $PID
+
+    skip=false
+    shift
+done

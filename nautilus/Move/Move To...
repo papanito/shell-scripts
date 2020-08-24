@@ -1,0 +1,46 @@
+#!/bin/bash
+#########################################################
+#							#
+# This are NScripts v3.4				#
+#							#
+# Licensed under the GNU GENERAL PUBLIC LICENSE 3	#
+#							#
+# Copyright 2007 - 2008 Christopher Bratusek		#
+#							#
+#########################################################
+
+if [[ -x /usr/bin/gksu || -x /opt/gnome/bin/gksu ]]; then
+	sudotool="gksu -u root"
+elif [[ -x /usr/bin/gnomesu || -x /opt/gnome/bin/gnomesu ]]; then
+	sudotool=gnomesu
+fi
+
+destination=$(zenity --file-selection --directory --title "Where to move files?")
+
+echo $NAUTILUS_SCRIPT_SELECTED_URIS > ~/.gnome2/temp_move_list
+
+for file in $(cat ~/.gnome2/temp_move_list); do \
+
+	file_name=$(echo $file | sed -e 's/file:\/\///g' -e 's/\%20/\ /g')
+	short_file_name=$(echo $file | sed -e 's#.*/##g' -e 's/\%20/\ /g')
+
+	if [[ -w $destination && -a $destination/$short_file_name ]]; then \
+		confirm=$(zenity zenity --question --text "Overwrite File $destination/$short_file_name?"; echo $?)
+		if [[ $confirm == 0 ]]; then
+			mv "$file_name" $destination
+			if (( $? != 0 )); then
+			zenity --info --text "Something went wrong" --title "Failure"
+			fi
+		fi
+	elif [[ -w $destination ]]; then \
+		mv "$file_name" $destination
+		if (( $? != 0 )); then
+		zenity --info --text "Something went wrong" --title "Failure"
+		fi
+	elif [[ -a $destination && $sudotool != "" ]]; then
+		$sudotool "mv '$file_name' $destination"
+	else	zenity --info --title "Failure" --text "$destination does either not\nexist or is not writable"
+	fi; \
+done
+
+rm -f ~/.gnome2/temp_move_list
