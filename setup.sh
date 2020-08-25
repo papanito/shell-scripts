@@ -3,7 +3,7 @@
 declare -A targetdir
 
 targetdir["scripts"]=~/bin
-targetdir["nautilus"]=~/.local/share/nautilus/scripts/
+targetdir["nautilus"]=~/.local/share/nautilus/
 
 RESTOW=
 ADOPT=
