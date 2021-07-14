@@ -11,12 +11,10 @@ Target directory should be specified as argument - if not `/root/` will be used 
 
 NOTE: this is currently only a simple test with permanent writing i.e. no random writing or reading. Therefore script needs to be extended accordingly
 Examples:
+
 ```
 TBD 
 ```
-## gnome-extensions-enable.sh
-
-Enables all gnome-shell extensions you have installed at once. This is useful after e.g. a crash of gnome-shell.
 
 ## kill-kube-ns.sh
 
@@ -27,3 +25,23 @@ kubectl get ns | awk '/Term/ { print $1 }' | while IFS= read -r line; do ~/bin/k
 ```
 
 Reference is [this post at stackoverflow.com](https://stackoverflow.com/questions/60230242/how-to-output-the-result-of-a-chain-of-commands-for-a-given-input-with-bash/60303522#60303522)
+
+## notify-google-chat.sh
+
+Script which posts a message to a google chat channel using the `-u URL`
+
+```
+SUMMARY
+TEXT
+```
+
+## notify-google-chat-systemd.sh
+
+Script which posts the full status of a systemd service (`-s SERVICENAME`) to a google chat channel using the `-u URL`
+
+```
+SERVICENAME@$(hostname)
+```$status```
+```
+
+`$status` is the result of `$(systemctl status --full $SERVICE)`
