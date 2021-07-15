@@ -1,10 +1,11 @@
 #!/bin/bash
 # Send notifications to desktop using notify-send (libnotify)
 SERVICE=
+USERID=1000
 
 # Function: Print a help message.
 usage() {
-  echo "Usage: $0 -s servicename -f" 1>&2
+  echo "Usage: $0 -s servicename -u username -f" 1>&2
 }
 
 # Function: Exit with error.
@@ -17,13 +18,16 @@ if [ "$#" -lt "2" ]; then
    exit_abnormal
 fi
 
-while getopts ":s:f" option; do
+while getopts ":s:u:f" option; do
    case ${option} in
       s )
          SERVICE=$OPTARG
          ;;
       f )
          FULLSTATUS=true
+         ;;
+      u )
+         USERID=$(id -u $OPTARG)
          ;;
       \? )
          exit_abnormal
@@ -40,4 +44,4 @@ else
 fi
 status=$(sed "s:'::g" <<< "$status")
 
-notify-send --app-name=$SERVICE $SERVICE@$(hostname) "$status"
+DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$USERID/bus notify-send --app-name=$SERVICE $SERVICE@$(hostname) "$status"
