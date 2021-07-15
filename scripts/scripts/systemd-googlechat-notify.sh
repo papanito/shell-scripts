@@ -18,7 +18,7 @@ if [ "$#" != "4" ]; then
    exit_abnormal
 fi
 
-while getopts ":u:s:t:" option; do
+while getopts ":u:s:" option; do
    case ${option} in
       s )
          SERVICE=$OPTARG

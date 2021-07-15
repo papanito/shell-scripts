@@ -35,7 +35,19 @@ SUMMARY
 TEXT
 ```
 
-## notify-google-chat-systemd.sh
+## systemd-notify.sh
+
+Script which posts the full status of a systemd service (`-s SERVICENAME`) to your notification are of your linux desktop using [`notify-send`](https://wiki.archlinux.org/title/Desktop_notifications#Bash)
+
+```
+SERVICENAME@$(hostname)
+$status
+```
+
+`$status` is the result of `$(systemctl status --full $SERVICE)`
+
+
+## systemd-googlechat-notify.sh
 
 Script which posts the full status of a systemd service (`-s SERVICENAME`) to a google chat channel using the `-u URL`
 
