@@ -5,7 +5,7 @@ URL=
 
 # Function: Print a help message.
 usage() {
-  echo "Usage: $0 -u url -s servicename" 1>&2
+  echo "Usage: $0 -s servicename -f" 1>&2
 }
 
 # Function: Exit with error.
@@ -14,11 +14,11 @@ exit_abnormal() {
   exit 1
 }
 
-if [ "$#" != "4" ]; then
+if [ "$#" -lt "4" ]; then
    exit_abnormal
 fi
 
-while getopts ":u:s:" option; do
+while getopts ":u:s:f" option; do
    case ${option} in
       s )
          SERVICE=$OPTARG
@@ -26,6 +26,9 @@ while getopts ":u:s:" option; do
       u )
          echo "Send to $OPTARG"
          URL=$OPTARG
+         ;;
+      f )
+         FULLSTATUS=true
          ;;
       \? )
          exit_abnormal
@@ -36,7 +39,11 @@ while getopts ":u:s:" option; do
     esac
 done
 
-status=$(systemctl status --full $SERVICE)
+if [ -v FULLSTATUS ]; then
+   status=$(systemctl status --full $SERVICE)
+else
+   status=$(systemctl status $SERVICE | grep Active)
+fi
 status=$(sed "s:'::g" <<< "$status")
 
 if [[ $URL =~ "https://chat.googleapis.com/v1/spaces" ]]; then

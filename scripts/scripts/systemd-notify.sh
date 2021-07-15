@@ -4,7 +4,7 @@ SERVICE=
 
 # Function: Print a help message.
 usage() {
-  echo "Usage: $0 -s servicename" 1>&2
+  echo "Usage: $0 -s servicename -f" 1>&2
 }
 
 # Function: Exit with error.
@@ -13,14 +13,17 @@ exit_abnormal() {
   exit 1
 }
 
-if [ "$#" != "2" ]; then
+if [ "$#" -lt "2" ]; then
    exit_abnormal
 fi
 
-while getopts ":s:" option; do
+while getopts ":s:f" option; do
    case ${option} in
       s )
          SERVICE=$OPTARG
+         ;;
+      f )
+         FULLSTATUS=true
          ;;
       \? )
          exit_abnormal
@@ -30,7 +33,11 @@ while getopts ":s:" option; do
       ;;
     esac
 done
-status=$(systemctl status --full $SERVICE)
+if [ -v FULLSTATUS ]; then
+   status=$(systemctl status --full $SERVICE)
+else
+   status=$(systemctl status $SERVICE | grep Active)
+fi
 status=$(sed "s:'::g" <<< "$status")
 
 notify-send --app-name=$SERVICE $SERVICE@$(hostname) "$status"
