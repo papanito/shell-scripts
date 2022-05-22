@@ -2,7 +2,7 @@
 # read the option and store in the variable, $option
 declare -A targetdir
 
-targetdir["scripts"]=~/.local/bin
+targetdir["scripts"]=~/.local/bin/
 targetdir["nautilus"]=~/.local/share/nautilus/
 
 RESTOW=
