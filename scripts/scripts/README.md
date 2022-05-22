@@ -16,7 +16,11 @@ Examples:
 TBD 
 ```
 
-## kill-kube-ns.sh
+## k8s-ingress-exporter.sh
+
+Easily export and/or ingress definition from one ns to another.
+
+## k8s-kill-kube-ns.sh
 
 Delete multiple namespaces in state `Terminating` by using the script [`kill-kube-ns.sh](./kill-kube-ns.sh) from Redha, which does the following
 
@@ -25,6 +29,10 @@ kubectl get ns | awk '/Term/ { print $1 }' | while IFS= read -r line; do ~/bin/k
 ```
 
 Reference is [this post at stackoverflow.com](https://stackoverflow.com/questions/60230242/how-to-output-the-result-of-a-chain-of-commands-for-a-given-input-with-bash/60303522#60303522)
+
+## k8s-secrets-exporter.sh
+
+Easily export and/or migrate secrets from one ns to another - useful if you don't use a secret manager
 
 ## notify-google-chat.sh
 
