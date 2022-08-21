@@ -1,5 +1,17 @@
 #!/bin/bash
-#Simple backup script to save essential configurations and data as tar file
+# @file backup_simple.sh
+# @brief simple backup script
+# @description
+#     Simple backup script to save essential configurations and data as tar file
+#
+#     Backups the following folders
+#
+#     - /var/lib/mysql/
+#     - /var/www
+#     - /etc
+#
+#     Saves data to `/mnt/backup/'$today`
+# @noargs
 
 today=`date '+%Y%m%d'`
 now=`date '+%Y%m%d%H%M'`

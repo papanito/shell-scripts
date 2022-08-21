@@ -1,15 +1,16 @@
 #!/bin/bash
 writetodisk() {
-	COUNTER=0
-	device=`df $OUTPUTDIR | grep -oe "/dev/[A-Za-z]*"`
-    	echo "directory $OUTPUTDIR selected for test. disk under test is $device"
-	while [ $COUNTER -lt $MAX ]; do
-		dd if=/dev/zero of=$OUTPUTDIR/$TESTFILE bs=1G count=1 oflag=direct | tee ~/$LOGFILE
-		let COUNTER=COUNTER+1
-	done
+    COUNTER=0
+    device=`df $OUTPUTDIR | grep -oe "/dev/[A-Za-z]*"`
+    echo "directory $OUTPUTDIR selected for test. disk under test is $device"
+    while [ $COUNTER -lt $MAX ]; do
+        dd if=/dev/zero of=$OUTPUTDIR/$TESTFILE bs=1G count=1 oflag=direct | tee ~/$LOGFILE
+        let COUNTER=COUNTER+1
+    done
 
-	rm $OUTPUTDIR/$TESTFILE
+    rm $OUTPUTDIR/$TESTFILE
 }
+
 #global parameters
 MAX=10
 OUTPUTDIR=/root
@@ -28,7 +29,7 @@ while getopts "hn:" optname
     case "$optname" in
       "h")
         echo "$usage"
-	exit
+  exit
         ;;
       "n")
         echo "test will be repeatet $OPTARG times"
@@ -43,7 +44,7 @@ while getopts "hn:" optname
       *)
       # Should not occur
         echo "Unknown error while processing options"
-	exit
+  exit
         ;;
     esac
 done
