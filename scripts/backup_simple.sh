@@ -2,7 +2,7 @@
 # @file backup_simple.sh
 # @brief simple backup script
 # @description
-#     Simple backup script to save essential configurations and data as tar file
+#     Simple backup script to save content of particular folders as a tar file
 #
 #     Backups the following folders
 #
@@ -10,7 +10,7 @@
 #     - /var/www
 #     - /etc
 #
-#     Saves data to `/mnt/backup/'$today`
+#     Saves data to `/mnt/backup/$today`
 # @noargs
 
 today=`date '+%Y%m%d'`

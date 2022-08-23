@@ -29,7 +29,7 @@ while getopts "hn:" optname
     case "$optname" in
       "h")
         echo "$usage"
-  exit
+        exit
         ;;
       "n")
         echo "test will be repeatet $OPTARG times"
@@ -42,9 +42,8 @@ while getopts "hn:" optname
         echo "No argument value for option $OPTARG"
         ;;
       *)
-      # Should not occur
         echo "Unknown error while processing options"
-  exit
+        exit
         ;;
     esac
 done

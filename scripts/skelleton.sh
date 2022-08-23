@@ -1,4 +1,13 @@
 #!/bin/bash -e
+# @file skeleton.sh
+# @brief Brief description fo what the script does
+# @description
+#     Detailed description of what the script does
+#
+#     * `-s <SERVICENAME>` name of the service
+#     * `-u <URL>` Url to Google chat channel webhook (https://chat.googleapis.com/v1/spaces/xxxx)
+#     * `-f` Show full status
+
 set -eo pipefail
 
 ### Variables - start
@@ -9,25 +18,36 @@ ERR_MSG="ERROR, please check log"
 ### Main functions - start
 trap 'ret=$?; printf "%s\n" "$ERR_MSG" >&2; exit "$ret"' ERR
 
+# @description print error message in case the function dies unexpectedly
+# @arg $1 string error message to display
 die() {
     echo -e "$*" 1>&2 ; exit 1; 
 }
 
+# @description Print a help message.
+# @arg $0 string name of the binary
 usage() {
-    echo "EXPLAIN WHAT THE SCRIPT DOES"
-    echo
-    echo "Syntax: $0 [-c CONTEXT|-n NAMESPACE]"
-    echo
-    echo "-c CONTEXT      kubectl context" 1>&2
-    echo "-n NAMESPACE    namespace in which you want to migrated" 1>&2
+   cat <<'END'
+EXPLAIN WHAT THE SCRIPT DOES
+
+Usage: $0 -s <SERVICENAME> -u <URL> -f
+     -s <SERVICENAME> name of the service
+     -u <URL> Url to Google chat channel webhook (https://chat.googleapis.com/v1/spaces/xxxx)
+     -f Show full status
+END
 }
 
-# Function: Exit with error.
+# @description Print usage message and exit with 1
+# @noargs
+# @exitcode 1 Always
 exit_abnormal() {
-    usage
-    exit 1
+   usage
+   exit 1
 }
 
+# @description Helper function to separate output with a given character
+# @arg $1 string (optional) character for separation, default is `-`
+# @arg $2 int (optional) how much characters to print, default is 80
 text_separator() {
    ch="-"
    len="80"
@@ -40,6 +60,9 @@ text_separator() {
    printf '%*s\n' "$len" | tr ' ' "$ch"
 }
 
+# @description Helper function to check if a given tool is installed, otherwise die
+# @arg $1 string name of the binary
+# @arg $2 string additional text to the error message (e.g. where to download)
 need() {
    which "$1" &>/dev/null || die "Binary '$1' is missing but required\n$2"
 }

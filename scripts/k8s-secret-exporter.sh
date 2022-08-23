@@ -1,29 +1,62 @@
 #!/bin/bash
+# @file k8s-secret-exporter.sh
+# @brief Export secrets of a given ns into one file per secret
+# @description
+#     Export secrets of a given ns in a given context into one file per secret
+#     Optionally import these to the same ns in another cluster (context)
+#     The script removes some basic metadata and only a selected list of secret types
 
+set -eo pipefail
+
+### Variables - start
 REMOVE_META=".metadata.managedFields,.status,.metadata.annotations,.metadata.resourceVersion,.metadata.selfLink,.metadata.uid,.metadata.creationTimestamp,.metadata.ownerReferences"
+TYPES_TO_EXPORT="type=Opaque type=kubernetes.io/tls type=microsoft.com/smb"
+### Variables - end
 
-# Function: Print a help message.
-usage() {
-    echo "This script exports all secrets from a context if secret is not managed by Helm"
-    echo "The script assumes you have yq installed and all your contexts (clusters) in a single KUBECONFIG"
-    echo "Usage:"
-    echo "- $0 -c CONTEXT -n NAMESPACE" 1>&2
-    echo "- $0 -c CONTEXT -n NAMESPACE -i CONTEXT_FOR_IMPORT" 1>&2
+### Main functions - start
+trap 'ret=$?; printf "%s\n" "$ERR_MSG" >&2; exit "$ret"' ERR
+
+# @description print error message in case the function dies unexpectedly
+# @arg $1 string error message to display
+# @internal
+die() {
+    echo -e "$*" 1>&2 ; exit 1; 
 }
 
-# Function: Exit with error.
+# @description Print a help message.
+# @arg $0 string name of the binary
+# @internal
+usage() {
+   cat <<'END'
+This script exports all secrets from a context if secret is not managed by Helm
+The script assumes you have yq installed and all your contexts (clusters) in a single KUBECONFIG.
+Use $NAMESPACE=ALL to do it for all namespaces
+
+
+Usage:
+- $0 -c CONTEXT -n NAMESPACE
+- $0 -c CONTEXT -n NAMESPACE -i CONTEXT_FOR_IMPORT
+END
+}
+
+# @description Print usage message and exit with 1
+# @noargs
+# @exitcode 1 Always
+# @internal
 exit_abnormal() {
     usage
     exit 1
 }
 
-TYPES_TO_EXPORT="type=Opaque type=kubernetes.io/tls type=microsoft.com/smb"
+# @description Helper function to check if a given tool is installed, otherwise die
+# @arg $1 string name of the binary
+# @arg $2 string additional text to the error message (e.g. where to download)
+# @internal
+need() {
+   which "$1" &>/dev/null || die "Binary '$1' is missing but required\n$2"
+}
 
-if ! command -v yq &> /dev/null
-then
-    echo "yq could not be found, but is required for this script to run."
-    exit
-fi
+need "yq" ""
 
 while getopts "hc:n:i:" options; do
     case ${options} in
@@ -90,17 +123,15 @@ for ns in $NAMESPACES; do
                 echo -e "** Get secrets $selector **\n";
                 for secret in $secrets; do
                     # ignore secrets we create via UI - they are for all namespaces
-                    if [[ ( "$secret" != "wildcard-ingress-cert") && ( "$secret" != "sc-ca-cert") ]]; then
-                        echo "${ns}_${secret}.yaml"
-                        kubectl get secret $secret -n $ns --context $CONTEXT -o yaml \
-                        | yq eval "del($REMOVE_META)" - \
-                        > "${TARGET}/${ns}_${secret}.yaml";
+                    echo "${ns}_${secret}.yaml"
+                    kubectl get secret $secret -n $ns --context $CONTEXT -o yaml \
+                    | yq eval "del($REMOVE_META)" - \
+                    > "${TARGET}/${ns}_${secret}.yaml";
 
-                        if [ "$DO_IMPORT" = "yes" ]; then
-                            echo -e "** import into $ns of $IMPORT_CONTEXT **"
-                            kubectl apply -f "${TARGET}/${ns}_${secret}.yaml" --context $IMPORT_CONTEXT
-                        fi
-                    fi;
+                    if [ "$DO_IMPORT" = "yes" ]; then
+                        echo -e "** import into $ns of $IMPORT_CONTEXT **"
+                        kubectl apply -f "${TARGET}/${ns}_${secret}.yaml" --context $IMPORT_CONTEXT
+                    fi
                 done;
             fi;
         done;

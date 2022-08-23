@@ -6,7 +6,7 @@ URL=
 
 # Function: Print a help message.
 usage() {
-  echo "Usage: $0 -u url -s summary -t text" 1>&2
+  echo "Usage: $0 -u <URL> -s <SUMMARY> -t <text>" 1>&2
 }
 
 # Function: Exit with error.
