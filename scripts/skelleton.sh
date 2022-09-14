@@ -45,27 +45,8 @@ exit_abnormal() {
    exit 1
 }
 
-# @description Helper function to separate output with a given character
-# @arg $1 string (optional) character for separation, default is `-`
-# @arg $2 int (optional) how much characters to print, default is 80
-text_separator() {
-   ch="-"
-   len="80"
-   if [ "$#" -eq 2 ]; then
-      ch=$1
-   elif [ "$#" -gt 2 ]; then
-      ch=$1
-      len=$2
-   fi 
-   printf '%*s\n' "$len" | tr ' ' "$ch"
-}
+## Ensure you have https://gitlab.com/papanito/shell-helper-library setup, I use some helper functions from this "libary"
 
-# @description Helper function to check if a given tool is installed, otherwise die
-# @arg $1 string name of the binary
-# @arg $2 string additional text to the error message (e.g. where to download)
-need() {
-   which "$1" &>/dev/null || die "Binary '$1' is missing but required\n$2"
-}
 
 ### Main Functions - end
 
