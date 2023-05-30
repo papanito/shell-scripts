@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # save stdout (by linking it on fd #4 for instance)
 exec 4<&1
 # redirect stderr

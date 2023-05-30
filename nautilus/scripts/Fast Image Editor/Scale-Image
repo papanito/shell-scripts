@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 title="Scale image"
 scale="Size to scale to <length>x<hight>"
 
 case $LANG in
 	sv* )
 		title="Skala bild"
-		scale="Storlek att skala till <längd>x<höjd>";;
+		scale="Storlek att skala till <lï¿½ngd>x<hï¿½jd>";;
 esac
 
 imgsize=`gdialog --title "$title" --inputbox "$scale" 200 100 2>&1`

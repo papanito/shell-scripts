@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #Script Type: Nautilus Script
 #Title: Extract Audio

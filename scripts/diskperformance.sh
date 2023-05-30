@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 writetodisk() {
     COUNTER=0
     device=`df $OUTPUTDIR | grep -oe "/dev/[A-Za-z]*"`

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # @file backup_simple.sh
 # @brief simple backup script
 # @description

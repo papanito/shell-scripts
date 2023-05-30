@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # marc brumlik, tailored software inc, Mon Sep  8 22:50:20 CDT 2008
 version="0.81 Tue Jan 19 14:29:49 CST 2010 --\nVideos can now be rotated\nVideo-->frames has been improved"

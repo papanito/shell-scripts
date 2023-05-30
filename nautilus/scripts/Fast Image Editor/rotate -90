@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # script by Orlando De Giorgi
 
 convert -rotate -90 $1 $1

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # unmount
 
 gksudo -k /bin/echo "got r00t?"

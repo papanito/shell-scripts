@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # replace tag {date} with a date value in format YYYYmmdd
 function getDate() {
     varname=$(echo $1 | sed -r 's/[\{\}]//g')

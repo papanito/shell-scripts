@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # @file backup_docker.sh
 # @brief This Script backups docker compose or volumes to a backup directory
 # @description

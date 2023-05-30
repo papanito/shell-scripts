@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ####################################################################
 # video-convert
 # Nautilus Video Convertor script 

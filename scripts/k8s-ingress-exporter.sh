@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # @file k8s-ingress-exporter.sh
 # @brief Export ingresses of a given ns into one file per ingress
 # @description

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # FILE:   merge pdf files -- 
 # AUTHOR: Adrian Wyssmann <aedu@wyssmann.com

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #########################################################################
 #Name: backup-docker-volumes.sh
 #Subscription: This Script backups docker volumes to a backup directory

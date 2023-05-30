@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # @file k8s-secret-exporter.sh
 # @brief Export secrets of a given ns into one file per secret
 # @description

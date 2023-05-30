@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Send notifications to a google chat channel
 SUMMARY=
 TEXT=

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #script via TheeMahn
 sudo umount /media/ISO
 for I in `echo $*`

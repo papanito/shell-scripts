@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # read the option and store in the variable, $option
 declare -A targetdir
 
