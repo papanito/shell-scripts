@@ -17,6 +17,10 @@
 #     * `-v <projects>` name of the service
 
 set -eo pipefail
+set -o unset
+set -o errexit
+set -o errtrace
+shopt -s inherit_errexit
 
 ### Variables - start
 DEBUG=0

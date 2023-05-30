@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
 # @file skeleton.sh
 # @brief Brief description fo what the script does
 # @description
@@ -9,6 +9,10 @@
 #     * `-f` Show full status
 
 set -eo pipefail
+set -o unset
+set -o errexit
+set -o errtrace
+shopt -s inherit_errexit
 
 ### Variables - start
 DEBUG=0

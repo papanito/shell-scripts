@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ###############################################################################
 # Copyright (c) 2018 Red Hat Inc
@@ -14,6 +14,10 @@
 ###############################################################################
 
 set -eo pipefail
+set -o unset
+set -o errexit
+set -o errtrace
+shopt -s inherit_errexit
 
 die() { echo "$*" 1>&2 ; exit 1; }
 

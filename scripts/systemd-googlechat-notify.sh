@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # @file systemd-googlechat-notify.sh
 # @brief Send notifications to a google chat channel about systemd service status
 # @description
@@ -9,6 +9,14 @@
 #     * `-f` Show full status
 # @set SERVICE
 set -eo pipefail
+set -o unset
+set -o errexit
+set -o errtrace
+shopt -s inherit_errexit
+set -o unset
+set -o errexit
+set -o errtrace
+shopt -s inherit_errexit
 SERVICE=
 URL=
 

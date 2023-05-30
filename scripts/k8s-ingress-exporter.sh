@@ -7,6 +7,10 @@
 #     The script removes some basic metadata
 
 set -eo pipefail
+set -o unset
+set -o errexit
+set -o errtrace
+shopt -s inherit_errexit
 
 ### Variables - start
 REMOVE_META=".metadata.managedFields,.status,.metadata.annotations,.metadata.resourceVersion,.metadata.selfLink,.metadata.uid,.metadata.creationTimestamp,.metadata.ownerReferences"
