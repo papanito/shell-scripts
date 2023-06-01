@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-gksudo geany $NAUTILUS_SCRIPT_SELECTED_URIS

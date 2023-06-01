@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-script-worker open $NAUTILUS_SCRIPT_SELECTED_URIS
