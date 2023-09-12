@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-sudo -A nautilus $NAUTILUS_SCRIPT_CURRENT_URI

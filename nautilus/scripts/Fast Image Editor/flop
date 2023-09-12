@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# script by Orlando De Giorgi
-
-convert -flop $1 $1
-
