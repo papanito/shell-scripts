@@ -9,7 +9,6 @@
 #     * `-f` Show full status
 
 set -eo pipefail
-set -o unset
 set -o errexit
 set -o errtrace
 shopt -s inherit_errexit
@@ -31,14 +30,14 @@ die() {
 # @description Print a help message.
 # @arg $0 string name of the binary
 usage() {
-   cat <<'END'
+   cat <<EOF
 EXPLAIN WHAT THE SCRIPT DOES
 
 Usage: $0 -s <SERVICENAME> -u <URL> -f
      -s <SERVICENAME> name of the service
      -u <URL> Url to Google chat channel webhook (https://chat.googleapis.com/v1/spaces/xxxx)
      -f Show full status
-END
+EOF
 }
 
 # @description Print usage message and exit with 1
